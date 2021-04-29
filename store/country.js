@@ -1,5 +1,6 @@
 export const state = () => ({
   countryDetail: [],
+  countryClone: [],
   Region: "Filter By Region"
 });
 
@@ -10,18 +11,26 @@ export const mutations = {
   },
   filterRegion(state, payload) {
     state.countryDetail = state.countryClone.filter(e => {
-      if (e.region === state.Region) {
+      if (e.region === payload) {
         return e;
       }
     });
-    console.log("hey");
+  },
+  filterByName(state, payload) {
+    if (payload === "") {
+      state.countryDetail = state.countryClone;
+    } else {
+      state.countryDetail = state.countryClone.filter(e => {
+        return e.name.toLowerCase().includes(payload.toLowerCase());
+      });
+    }
   }
 };
 
 export const actions = {
   async getCountries({ commit }) {
     const res = await this.$axios.get("all");
-    console.log(res);
+
     commit("getData", res.data);
   }
 };

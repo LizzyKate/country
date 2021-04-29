@@ -6,6 +6,8 @@
           type="text"
           class="bg-white shadow px-4 py-2 text-blue-100 font-poppins text-sm focus:outline-none rounded"
           placeholder="Search for a country"
+          v-model="countryName"
+          @change="filterName"
         />
       </div>
       <div>
@@ -19,13 +21,8 @@
         >
           <option selected disabled>Filter By Region</option>
 
-          <option
-            v-for="(name, i) in country"
-            :key="i"
-            :value="name.regionalBlocs"
-            @click="region = name.region"
-          >
-            {{ name.region }}
+          <option v-for="(name, i) in regions" :key="i" @click="region = name">
+            {{ name }}
           </option>
         </select>
       </div>
@@ -37,7 +34,7 @@
         :key="i"
       >
         <div>
-          <img src="/flag.jpg" alt="" />
+          <img :src="name.flag" alt="" />
         </div>
         <div class="p-4 mt-4">
           <h2 class="font-poppins text-blue-100  text-lg">{{ name.name }}</h2>
@@ -63,23 +60,30 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      region: "Filter By Region",
+      regions: [],
+      countryName: ""
+    };
   },
   computed: {
     country() {
       return this.$store.state.country.countryDetail;
-    },
-    region() {
-      return this.$store.state.country.Region;
     }
   },
-  mounted() {
-    this.$store.dispatch("country/getCountries");
+  async mounted() {
+    await this.$store.dispatch("country/getCountries");
+    this.country.forEach(e => {
+      this.regions.push(e.region);
+    });
+    this.regions = [...new Set(this.regions)];
   },
   methods: {
     filterRegion() {
-      console.log("input");
-      this.$store.commit("country/filterRegion");
+      this.$store.commit("country/filterRegion", this.region);
+    },
+    filterName() {
+      this.$store.commit("country/filterByName", this.countryName);
     }
   }
 };
